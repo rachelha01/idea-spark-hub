@@ -14,6 +14,159 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          id: string
+          record_id: string | null
+          table_name: string
+          user_email: string | null
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          record_id?: string | null
+          table_name: string
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          record_id?: string | null
+          table_name?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
+      diversifikasi_rm: {
+        Row: {
+          alokasi: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          jenis_scale_up: string | null
+          jenis_stabtest: string | null
+          kesimpulan: string | null
+          kimia: string | null
+          kode_item: string | null
+          kondisi_penyimpanan_stabtest: string | null
+          link_hasil_analisa: string | null
+          link_report: string | null
+          manufacture: string | null
+          mikrobiologi: string | null
+          nama_material: string | null
+          no_batch_material: string | null
+          no_batch_scale_up: string | null
+          sensori_material: string | null
+          sensori_produk: string | null
+          status_scale_up: string | null
+          tes_fisik: string | null
+          tes_kimia: string | null
+          tes_mikrobiologi: string | null
+          tes_sensori: string | null
+          tgl_analisa_andev: string | null
+          tgl_dilakukan_scale_up: string | null
+          tgl_jatuh_tempo: string | null
+          tgl_kirim_cpro: string | null
+          tgl_kirim_sampel_ke_qc: string | null
+          tgl_masuk_stabtest: string | null
+          tgl_report: string | null
+          tgl_selesai_stabtest: string | null
+          tgl_terima_di_ts: string | null
+          tgl_terima_sampel_scale_up: string | null
+          updated_at: string
+          usia_penyimpanan: string | null
+        }
+        Insert: {
+          alokasi?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          jenis_scale_up?: string | null
+          jenis_stabtest?: string | null
+          kesimpulan?: string | null
+          kimia?: string | null
+          kode_item?: string | null
+          kondisi_penyimpanan_stabtest?: string | null
+          link_hasil_analisa?: string | null
+          link_report?: string | null
+          manufacture?: string | null
+          mikrobiologi?: string | null
+          nama_material?: string | null
+          no_batch_material?: string | null
+          no_batch_scale_up?: string | null
+          sensori_material?: string | null
+          sensori_produk?: string | null
+          status_scale_up?: string | null
+          tes_fisik?: string | null
+          tes_kimia?: string | null
+          tes_mikrobiologi?: string | null
+          tes_sensori?: string | null
+          tgl_analisa_andev?: string | null
+          tgl_dilakukan_scale_up?: string | null
+          tgl_jatuh_tempo?: string | null
+          tgl_kirim_cpro?: string | null
+          tgl_kirim_sampel_ke_qc?: string | null
+          tgl_masuk_stabtest?: string | null
+          tgl_report?: string | null
+          tgl_selesai_stabtest?: string | null
+          tgl_terima_di_ts?: string | null
+          tgl_terima_sampel_scale_up?: string | null
+          updated_at?: string
+          usia_penyimpanan?: string | null
+        }
+        Update: {
+          alokasi?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          jenis_scale_up?: string | null
+          jenis_stabtest?: string | null
+          kesimpulan?: string | null
+          kimia?: string | null
+          kode_item?: string | null
+          kondisi_penyimpanan_stabtest?: string | null
+          link_hasil_analisa?: string | null
+          link_report?: string | null
+          manufacture?: string | null
+          mikrobiologi?: string | null
+          nama_material?: string | null
+          no_batch_material?: string | null
+          no_batch_scale_up?: string | null
+          sensori_material?: string | null
+          sensori_produk?: string | null
+          status_scale_up?: string | null
+          tes_fisik?: string | null
+          tes_kimia?: string | null
+          tes_mikrobiologi?: string | null
+          tes_sensori?: string | null
+          tgl_analisa_andev?: string | null
+          tgl_dilakukan_scale_up?: string | null
+          tgl_jatuh_tempo?: string | null
+          tgl_kirim_cpro?: string | null
+          tgl_kirim_sampel_ke_qc?: string | null
+          tgl_masuk_stabtest?: string | null
+          tgl_report?: string | null
+          tgl_selesai_stabtest?: string | null
+          tgl_terima_di_ts?: string | null
+          tgl_terima_sampel_scale_up?: string | null
+          updated_at?: string
+          usia_penyimpanan?: string | null
+        }
+        Relationships: []
+      }
       metrics: {
         Row: {
           created_at: string
@@ -134,6 +287,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           display_name: string | null
+          division: string | null
           email: string | null
           id: string
           updated_at: string
@@ -143,6 +297,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          division?: string | null
           email?: string | null
           id?: string
           updated_at?: string
@@ -152,6 +307,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           display_name?: string | null
+          division?: string | null
           email?: string | null
           id?: string
           updated_at?: string
@@ -183,6 +339,81 @@ export type Database = {
           id?: string
           name?: string
           population?: number | null
+        }
+        Relationships: []
+      }
+      sample_qc: {
+        Row: {
+          batch: string | null
+          created_at: string
+          created_by: string | null
+          hasil_analisa: string | null
+          id: string
+          identitas_ma: string | null
+          jenis_pengujian: string | null
+          kode_produk: string | null
+          kondisi_penyimpanan: string | null
+          leadtime_analisa: string | null
+          ma_oracle: string | null
+          nama_produk: string | null
+          no_ppoj: string | null
+          oos: string | null
+          pic: string | null
+          revisi: string | null
+          status: string | null
+          tgl_kirim: string | null
+          tgl_selesai_analisa: string | null
+          updated_at: string
+          usia_sampel_angka: number | null
+          usia_sampel_dmy: string | null
+        }
+        Insert: {
+          batch?: string | null
+          created_at?: string
+          created_by?: string | null
+          hasil_analisa?: string | null
+          id?: string
+          identitas_ma?: string | null
+          jenis_pengujian?: string | null
+          kode_produk?: string | null
+          kondisi_penyimpanan?: string | null
+          leadtime_analisa?: string | null
+          ma_oracle?: string | null
+          nama_produk?: string | null
+          no_ppoj?: string | null
+          oos?: string | null
+          pic?: string | null
+          revisi?: string | null
+          status?: string | null
+          tgl_kirim?: string | null
+          tgl_selesai_analisa?: string | null
+          updated_at?: string
+          usia_sampel_angka?: number | null
+          usia_sampel_dmy?: string | null
+        }
+        Update: {
+          batch?: string | null
+          created_at?: string
+          created_by?: string | null
+          hasil_analisa?: string | null
+          id?: string
+          identitas_ma?: string | null
+          jenis_pengujian?: string | null
+          kode_produk?: string | null
+          kondisi_penyimpanan?: string | null
+          leadtime_analisa?: string | null
+          ma_oracle?: string | null
+          nama_produk?: string | null
+          no_ppoj?: string | null
+          oos?: string | null
+          pic?: string | null
+          revisi?: string | null
+          status?: string | null
+          tgl_kirim?: string | null
+          tgl_selesai_analisa?: string | null
+          updated_at?: string
+          usia_sampel_angka?: number | null
+          usia_sampel_dmy?: string | null
         }
         Relationships: []
       }
