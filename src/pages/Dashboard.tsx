@@ -2,28 +2,13 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { addDays, isAfter, isBefore, format } from "date-fns";
 
@@ -35,10 +20,16 @@ const COLORS = [
   "hsl(340, 75%, 55%)",
 ];
 
+interface Warning {
+  type: string;
+  item: string;
+  dueDate: string;
+}
+
 export default function Dashboard() {
   const [diversifikasiData, setDiversifikasiData] = useState<any[]>([]);
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
-  const [warnings, setWarnings] = useState<any[]>([]);
+  const [warnings, setWarnings] = useState<Warning[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,11 +40,12 @@ export default function Dashboard() {
       setDiversifikasiData(div ?? []);
       setSampleQcData(sqc ?? []);
 
-      // Check due date warnings (2 days before)
+      // Check due date warnings (2 days before) from BOTH tables
       const now = new Date();
       const warningDate = addDays(now, 2);
-      const w: any[] = [];
-      (div ?? []).forEach((d) => {
+      const w: Warning[] = [];
+
+      (div ?? []).forEach((d: any) => {
         if (d.tgl_jatuh_tempo) {
           const due = new Date(d.tgl_jatuh_tempo);
           if (isBefore(due, warningDate) && isAfter(due, addDays(now, -1))) {
@@ -65,6 +57,20 @@ export default function Dashboard() {
           }
         }
       });
+
+      (sqc ?? []).forEach((d: any) => {
+        if (d.tgl_jatuh_tempo) {
+          const due = new Date(d.tgl_jatuh_tempo);
+          if (isBefore(due, warningDate) && isAfter(due, addDays(now, -1))) {
+            w.push({
+              type: "Sample QC",
+              item: d.nama_produk ?? d.kode_produk,
+              dueDate: d.tgl_jatuh_tempo,
+            });
+          }
+        }
+      });
+
       setWarnings(w);
     };
     fetchData();
@@ -107,6 +113,9 @@ export default function Dashboard() {
               <ul className="space-y-1 text-sm">
                 {warnings.map((w, i) => (
                   <li key={i}>
+                    <span className="inline-block bg-warning/20 text-warning text-xs px-1.5 py-0.5 rounded mr-2 font-medium">
+                      {w.type}
+                    </span>
                     <strong>{w.item}</strong> — jatuh tempo{" "}
                     {format(new Date(w.dueDate), "dd/MM/yyyy")}
                   </li>

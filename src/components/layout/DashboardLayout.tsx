@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Moon, Sun, Menu, X } from "lucide-react";
 import logoLight from "@/assets/B7-logo-nobg.png";
 import logoDark from "@/assets/B7-logo-white.png";
+import { NotificationBell } from "./NotificationBell";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -55,6 +56,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <span className="text-sm hidden sm:block">
               {userName} <span className="opacity-70">({userRole})</span>
             </span>
+            <NotificationBell />
             <Button
               variant="ghost"
               size="icon"
