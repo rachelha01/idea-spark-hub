@@ -39,6 +39,7 @@ const ALL_FIELDS = [
   { key: "hasil_analisa", label: "Hasil Analisa", type: "text" },
   { key: "status", label: "Status", type: "text" },
   { key: "oos", label: "OOS", type: "text" },
+  { key: "tgl_jatuh_tempo", label: "Tgl Jatuh Tempo", type: "date" },
 ];
 
 export default function SampleQC() {

@@ -222,6 +222,42 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          source_id: string | null
+          source_table: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          source_id?: string | null
+          source_table?: string | null
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          source_id?: string | null
+          source_table?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           category: string
@@ -361,6 +397,7 @@ export type Database = {
           pic: string | null
           revisi: string | null
           status: string | null
+          tgl_jatuh_tempo: string | null
           tgl_kirim: string | null
           tgl_selesai_analisa: string | null
           updated_at: string
@@ -385,6 +422,7 @@ export type Database = {
           pic?: string | null
           revisi?: string | null
           status?: string | null
+          tgl_jatuh_tempo?: string | null
           tgl_kirim?: string | null
           tgl_selesai_analisa?: string | null
           updated_at?: string
@@ -409,6 +447,7 @@ export type Database = {
           pic?: string | null
           revisi?: string | null
           status?: string | null
+          tgl_jatuh_tempo?: string | null
           tgl_kirim?: string | null
           tgl_selesai_analisa?: string | null
           updated_at?: string
