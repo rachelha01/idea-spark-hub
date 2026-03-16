@@ -95,7 +95,8 @@ export default function SampleQC() {
       await logActivity("update", "sample_qc", editingItem.id, formData);
       toast.success("Data berhasil diupdate");
     } else {
-      const { error } = await supabase.from("sample_qc").insert(formData);
+      const insertData = { ...formData, ...(activeSite !== "all" ? { site: activeSite } : {}) };
+      const { error } = await supabase.from("sample_qc").insert(insertData);
       if (error) { toast.error(error.message); return; }
       await logActivity("create", "sample_qc", undefined, formData);
       toast.success("Data berhasil ditambahkan");

@@ -108,7 +108,8 @@ export default function DiversifikasiRM() {
       await logActivity("update", "diversifikasi_rm", editingItem.id, formData);
       toast.success("Data berhasil diupdate");
     } else {
-      const { error } = await supabase.from("diversifikasi_rm").insert(formData);
+      const insertData = { ...formData, ...(activeSite !== "all" ? { site: activeSite } : {}) };
+      const { error } = await supabase.from("diversifikasi_rm").insert(insertData);
       if (error) { toast.error(error.message); return; }
       await logActivity("create", "diversifikasi_rm", undefined, formData);
       toast.success("Data berhasil ditambahkan");
