@@ -34,11 +34,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserMeta = useCallback(async (userId: string) => {
     const [{ data: roles }, { data: profile }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", userId),
-      supabase.from("profiles").select("display_name, division").eq("user_id", userId).single(),
+      supabase.from("profiles").select("display_name, division, site").eq("user_id", userId).single(),
     ]);
     setUserRole(roles?.[0]?.role ?? "user");
     setUserDivision(profile?.division ?? null);
     setUserName(profile?.display_name ?? null);
+    setUserSite(profile?.site ?? null);
   }, []);
 
   useEffect(() => {
