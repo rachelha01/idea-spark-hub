@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,13 +13,13 @@ import { Label } from "@/components/ui/label";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { logActivity } from "@/lib/activity-logger";
+import { Badge } from "@/components/ui/badge";
 
 function encodePassword(pw: string): string {
-  // ASCII to Base64
   return btoa(pw);
 }
 
@@ -29,6 +29,7 @@ interface UserRow {
   display_name: string | null;
   email: string | null;
   division: string | null;
+  site: string | null;
   role: string;
 }
 
@@ -39,6 +40,7 @@ export default function UsersPage() {
   const [formEmail, setFormEmail] = useState("");
   const [formPassword, setFormPassword] = useState("");
   const [formDivision, setFormDivision] = useState("");
+  const [formSite, setFormSite] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPw, setShowPw] = useState<Record<string, boolean>>({});
 
@@ -55,6 +57,7 @@ export default function UsersPage() {
           display_name: p.display_name,
           email: p.email,
           division: p.division,
+          site: p.site ?? null,
           role: r?.role ?? "user",
         };
       });
@@ -65,14 +68,12 @@ export default function UsersPage() {
   useEffect(() => { fetchUsers(); }, []);
 
   const handleCreate = async () => {
-    if (!formName || !formEmail || !formPassword || !formDivision) {
+    if (!formName || !formEmail || !formPassword || !formDivision || !formSite) {
       toast.error("Semua field harus diisi");
       return;
     }
     setLoading(true);
 
-    // Create user via edge function or admin API
-    // Since we can't use admin API from client, we use supabase auth signup with auto-confirm
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: formEmail,
       password: formPassword,
@@ -89,16 +90,13 @@ export default function UsersPage() {
     }
 
     if (authData.user) {
-      // Update profile with division
-      await supabase.from("profiles").update({ division: formDivision }).eq("user_id", authData.user.id);
+      await supabase.from("profiles").update({ division: formDivision, site: formSite }).eq("user_id", authData.user.id);
 
-      // Update role
       const roleMap: Record<string, "admin" | "cpro" | "qc" | "ts" | "user"> = { CPro: "cpro", QC: "qc", TS: "ts", Admin: "admin" };
       const role = roleMap[formDivision] ?? "user";
-      await supabase.from("user_roles").update({ role } as any).eq("user_id", authData.user.id);
       await supabase.from("user_roles").update({ role }).eq("user_id", authData.user.id);
 
-      await logActivity("create", "users", authData.user.id, { name: formName, email: formEmail, division: formDivision });
+      await logActivity("create", "users", authData.user.id, { name: formName, email: formEmail, division: formDivision, site: formSite });
       toast.success("User berhasil ditambahkan");
     }
 
@@ -107,11 +105,18 @@ export default function UsersPage() {
     setFormEmail("");
     setFormPassword("");
     setFormDivision("");
+    setFormSite("");
     setLoading(false);
     fetchUsers();
   };
 
   const togglePw = (id: string) => setShowPw((s) => ({ ...s, [id]: !s[id] }));
+
+  const siteLabel = (site: string | null) => {
+    if (site === "cikarang") return "Cikarang";
+    if (site === "pulogadung") return "Pulogadung";
+    return site ?? "-";
+  };
 
   return (
     <DashboardLayout>
@@ -132,6 +137,7 @@ export default function UsersPage() {
                   <TableHead>Nama</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Divisi</TableHead>
+                  <TableHead>Site</TableHead>
                   <TableHead>Role</TableHead>
                   <TableHead>Password (encrypted)</TableHead>
                 </TableRow>
@@ -143,6 +149,11 @@ export default function UsersPage() {
                     <TableCell>{u.display_name}</TableCell>
                     <TableCell>{u.email}</TableCell>
                     <TableCell>{u.division ?? "-"}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">
+                        {siteLabel(u.site)}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{u.role}</TableCell>
                     <TableCell className="font-mono text-xs">
                       {showPw[u.id] ? encodePassword(u.email ?? "") : "••••••••"}
@@ -184,6 +195,16 @@ export default function UsersPage() {
                     <SelectItem value="CPro">CPro</SelectItem>
                     <SelectItem value="QC">QC</SelectItem>
                     <SelectItem value="TS">TS</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label>Site</Label>
+                <Select value={formSite} onValueChange={setFormSite}>
+                  <SelectTrigger><SelectValue placeholder="Pilih site" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cikarang">Cikarang</SelectItem>
+                    <SelectItem value="pulogadung">Pulogadung</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
