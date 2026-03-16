@@ -28,6 +28,7 @@ interface Warning {
 }
 
 export default function Dashboard() {
+  const { activeSite } = useSite();
   const [diversifikasiData, setDiversifikasiData] = useState<any[]>([]);
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
