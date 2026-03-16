@@ -58,6 +58,7 @@ const ALL_FIELDS = [
 
 export default function DiversifikasiRM() {
   const { userRole } = useAuth();
+  const { activeSite } = useSite();
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
