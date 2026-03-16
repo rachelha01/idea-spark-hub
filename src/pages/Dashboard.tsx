@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useSite } from "@/contexts/SiteContext";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -27,6 +28,7 @@ interface Warning {
 }
 
 export default function Dashboard() {
+  const { activeSite } = useSite();
   const [diversifikasiData, setDiversifikasiData] = useState<any[]>([]);
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
@@ -35,10 +37,15 @@ export default function Dashboard() {
     const fetchData = async () => {
       const twoWeeksAgo = format(subDays(new Date(), 14), "yyyy-MM-dd");
 
-      const [{ data: div }, { data: sqc }] = await Promise.all([
-        supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("sample_qc").select("*").order("created_at", { ascending: false }).limit(500),
-      ]);
+      let divQuery = supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false }).limit(100);
+      let sqcQuery = supabase.from("sample_qc").select("*").order("created_at", { ascending: false }).limit(500);
+
+      if (activeSite !== "all") {
+        divQuery = divQuery.eq("site", activeSite);
+        sqcQuery = sqcQuery.eq("site", activeSite);
+      }
+
+      const [{ data: div }, { data: sqc }] = await Promise.all([divQuery, sqcQuery]);
       setDiversifikasiData(div ?? []);
       setSampleQcData(sqc ?? []);
 
@@ -68,7 +75,7 @@ export default function Dashboard() {
       setWarnings(w);
     };
     fetchData();
-  }, []);
+  }, [activeSite]);
 
   // Line Chart: daily sample count over last 2 weeks (by nama_produk from tgl_kirim)
   const twoWeeksAgo = subDays(new Date(), 14);

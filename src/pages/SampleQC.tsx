@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Search, Download, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSite } from "@/contexts/SiteContext";
 import { canEditField } from "@/lib/division-permissions";
 import { logActivity } from "@/lib/activity-logger";
 import { toast } from "sonner";
@@ -44,6 +45,7 @@ const ALL_FIELDS = [
 
 export default function SampleQC() {
   const { userRole } = useAuth();
+  const { activeSite } = useSite();
   const [data, setData] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -54,11 +56,13 @@ export default function SampleQC() {
   const [exportMaterial, setExportMaterial] = useState("");
 
   const fetchData = async () => {
-    const { data: d } = await supabase.from("sample_qc").select("*").order("created_at", { ascending: false });
+    let query = supabase.from("sample_qc").select("*").order("created_at", { ascending: false });
+    if (activeSite !== "all") query = query.eq("site", activeSite);
+    const { data: d } = await query;
     setData(d ?? []);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [activeSite]);
 
   const editableFields = useMemo(
     () => ALL_FIELDS.filter((f) => canEditField(userRole, "sample_qc", f.key)),
@@ -91,7 +95,8 @@ export default function SampleQC() {
       await logActivity("update", "sample_qc", editingItem.id, formData);
       toast.success("Data berhasil diupdate");
     } else {
-      const { error } = await supabase.from("sample_qc").insert(formData);
+      const insertData = { ...formData, ...(activeSite !== "all" ? { site: activeSite } : {}) };
+      const { error } = await supabase.from("sample_qc").insert(insertData);
       if (error) { toast.error(error.message); return; }
       await logActivity("create", "sample_qc", undefined, formData);
       toast.success("Data berhasil ditambahkan");
