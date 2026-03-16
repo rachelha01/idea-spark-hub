@@ -9,6 +9,7 @@ interface AuthContextType {
   userRole: string | null;
   userDivision: string | null;
   userName: string | null;
+  userSite: string | null;
   signOut: () => Promise<void>;
 }
 
