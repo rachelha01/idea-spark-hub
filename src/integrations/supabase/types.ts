@@ -71,6 +71,7 @@ export type Database = {
           no_batch_scale_up: string | null
           sensori_material: string | null
           sensori_produk: string | null
+          site: string | null
           status_scale_up: string | null
           tes_fisik: string | null
           tes_kimia: string | null
@@ -109,6 +110,7 @@ export type Database = {
           no_batch_scale_up?: string | null
           sensori_material?: string | null
           sensori_produk?: string | null
+          site?: string | null
           status_scale_up?: string | null
           tes_fisik?: string | null
           tes_kimia?: string | null
@@ -147,6 +149,7 @@ export type Database = {
           no_batch_scale_up?: string | null
           sensori_material?: string | null
           sensori_produk?: string | null
+          site?: string | null
           status_scale_up?: string | null
           tes_fisik?: string | null
           tes_kimia?: string | null
@@ -326,6 +329,7 @@ export type Database = {
           division: string | null
           email: string | null
           id: string
+          site: string | null
           updated_at: string
           user_id: string
         }
@@ -336,6 +340,7 @@ export type Database = {
           division?: string | null
           email?: string | null
           id?: string
+          site?: string | null
           updated_at?: string
           user_id: string
         }
@@ -346,6 +351,7 @@ export type Database = {
           division?: string | null
           email?: string | null
           id?: string
+          site?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -396,6 +402,7 @@ export type Database = {
           oos: string | null
           pic: string | null
           revisi: string | null
+          site: string | null
           status: string | null
           tgl_jatuh_tempo: string | null
           tgl_kirim: string | null
@@ -421,6 +428,7 @@ export type Database = {
           oos?: string | null
           pic?: string | null
           revisi?: string | null
+          site?: string | null
           status?: string | null
           tgl_jatuh_tempo?: string | null
           tgl_kirim?: string | null
@@ -446,6 +454,7 @@ export type Database = {
           oos?: string | null
           pic?: string | null
           revisi?: string | null
+          site?: string | null
           status?: string | null
           tgl_jatuh_tempo?: string | null
           tgl_kirim?: string | null
