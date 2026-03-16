@@ -75,7 +75,7 @@ export default function Dashboard() {
       setWarnings(w);
     };
     fetchData();
-  }, []);
+  }, [activeSite]);
 
   // Line Chart: daily sample count over last 2 weeks (by nama_produk from tgl_kirim)
   const twoWeeksAgo = subDays(new Date(), 14);
