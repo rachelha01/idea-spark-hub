@@ -69,11 +69,13 @@ export default function DiversifikasiRM() {
   const [exportMaterial, setExportMaterial] = useState("");
 
   const fetchData = async () => {
-    const { data: d } = await supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false });
+    let query = supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false });
+    if (activeSite !== "all") query = query.eq("site", activeSite);
+    const { data: d } = await query;
     setData(d ?? []);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { fetchData(); }, [activeSite]);
 
   const editableFields = useMemo(
     () => ALL_FIELDS.filter((f) => canEditField(userRole, "diversifikasi", f.key)),
