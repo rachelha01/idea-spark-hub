@@ -2,11 +2,16 @@ import { ReactNode, useState } from "react";
 import { AppSidebar } from "./AppSidebar";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSite, SiteKey } from "@/contexts/SiteContext";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, MapPin } from "lucide-react";
 import logoLight from "@/assets/B7-logo-nobg.png";
 import logoDark from "@/assets/B7-logo-white.png";
 import { NotificationBell } from "./NotificationBell";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -15,6 +20,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { theme, toggleTheme } = useTheme();
   const { userName, userRole } = useAuth();
+  const { activeSite, setActiveSite, canChangeSite, siteLabel } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -53,6 +59,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             />
           </div>
           <div className="flex items-center gap-3">
+            {/* Site Selector / Info */}
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-4 w-4 text-navbar-foreground/70" />
+              {canChangeSite ? (
+                <Select value={activeSite} onValueChange={(v) => setActiveSite(v as SiteKey)}>
+                  <SelectTrigger className="w-[130px] h-8 text-xs bg-transparent border-navbar-foreground/30 text-navbar-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Semua Site</SelectItem>
+                    <SelectItem value="cikarang">Cikarang</SelectItem>
+                    <SelectItem value="pulogadung">Pulogadung</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge variant="outline" className="text-xs border-navbar-foreground/30 text-navbar-foreground">
+                  {siteLabel(activeSite)}
+                </Badge>
+              )}
+            </div>
+
             <span className="text-sm hidden sm:block">
               {userName} <span className="opacity-70">({userRole})</span>
             </span>
