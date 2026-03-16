@@ -56,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUserRole(null);
           setUserDivision(null);
           setUserName(null);
+          setUserSite(null);
         }
         setLoading(false);
       }
