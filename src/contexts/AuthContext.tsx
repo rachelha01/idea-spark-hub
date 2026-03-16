@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userDivision, setUserDivision] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [userSite, setUserSite] = useState<string | null>(null);
 
   const signOut = useCallback(async () => {
     localStorage.removeItem("login_time");
