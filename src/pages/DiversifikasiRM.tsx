@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Search, Download, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSite } from "@/contexts/SiteContext";
 import { canEditField } from "@/lib/division-permissions";
 import { logActivity } from "@/lib/activity-logger";
 import { toast } from "sonner";
