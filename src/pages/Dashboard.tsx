@@ -37,10 +37,15 @@ export default function Dashboard() {
     const fetchData = async () => {
       const twoWeeksAgo = format(subDays(new Date(), 14), "yyyy-MM-dd");
 
-      const [{ data: div }, { data: sqc }] = await Promise.all([
-        supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false }).limit(100),
-        supabase.from("sample_qc").select("*").order("created_at", { ascending: false }).limit(500),
-      ]);
+      let divQuery = supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false }).limit(100);
+      let sqcQuery = supabase.from("sample_qc").select("*").order("created_at", { ascending: false }).limit(500);
+
+      if (activeSite !== "all") {
+        divQuery = divQuery.eq("site", activeSite);
+        sqcQuery = sqcQuery.eq("site", activeSite);
+      }
+
+      const [{ data: div }, { data: sqc }] = await Promise.all([divQuery, sqcQuery]);
       setDiversifikasiData(div ?? []);
       setSampleQcData(sqc ?? []);
 
