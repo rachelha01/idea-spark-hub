@@ -122,10 +122,15 @@ export default function SampleQC() {
     toast.info(`Export ${format.toUpperCase()} akan segera tersedia (fitur template sedang dikembangkan)`);
   };
 
-  const filtered = data.filter((d) =>
-    (d.nama_produk ?? "").toLowerCase().includes(search.toLowerCase()) ||
-    (d.kode_produk ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = data.filter((d) => {
+    const s = search.toLowerCase();
+    return (
+      (d.nama_produk ?? "").toLowerCase().includes(s) ||
+      (d.kode_produk ?? "").toLowerCase().includes(s) ||
+      (d.batch ?? "").toLowerCase().includes(s) ||
+      (d.pic ?? "").toLowerCase().includes(s)
+    );
+  });
 
   const produkNames = [...new Set(data.map((d) => d.nama_produk).filter(Boolean))];
 
@@ -189,7 +194,7 @@ export default function SampleQC() {
         {/* Search */}
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Cari produk / kode..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Cari kode produk, nama produk, batch, PIC..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
 
         {/* Table */}

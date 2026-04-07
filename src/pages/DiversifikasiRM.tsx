@@ -135,10 +135,15 @@ export default function DiversifikasiRM() {
     toast.info(`Export ${format.toUpperCase()} akan segera tersedia (fitur template sedang dikembangkan)`);
   };
 
-  const filtered = data.filter((d) =>
-    (d.nama_material ?? "").toLowerCase().includes(search.toLowerCase()) ||
-    (d.kode_item ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = data.filter((d) => {
+    const s = search.toLowerCase();
+    return (
+      (d.nama_material ?? "").toLowerCase().includes(s) ||
+      (d.kode_item ?? "").toLowerCase().includes(s) ||
+      (d.manufacture ?? "").toLowerCase().includes(s) ||
+      (d.no_batch_material ?? "").toLowerCase().includes(s)
+    );
+  });
 
   const materialNames = [...new Set(data.map((d) => d.nama_material).filter(Boolean))];
 
@@ -202,7 +207,7 @@ export default function DiversifikasiRM() {
         {/* Search */}
         <div className="relative max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Cari material / kode..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Cari kode item, nama material, manufacture, no batch..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
         </div>
 
         {/* Table */}
