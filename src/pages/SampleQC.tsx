@@ -122,10 +122,15 @@ export default function SampleQC() {
     toast.info(`Export ${format.toUpperCase()} akan segera tersedia (fitur template sedang dikembangkan)`);
   };
 
-  const filtered = data.filter((d) =>
-    (d.nama_produk ?? "").toLowerCase().includes(search.toLowerCase()) ||
-    (d.kode_produk ?? "").toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = data.filter((d) => {
+    const s = search.toLowerCase();
+    return (
+      (d.nama_produk ?? "").toLowerCase().includes(s) ||
+      (d.kode_produk ?? "").toLowerCase().includes(s) ||
+      (d.batch ?? "").toLowerCase().includes(s) ||
+      (d.pic ?? "").toLowerCase().includes(s)
+    );
+  });
 
   const produkNames = [...new Set(data.map((d) => d.nama_produk).filter(Boolean))];
 
