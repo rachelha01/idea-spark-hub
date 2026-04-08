@@ -311,19 +311,24 @@ export default function DiversifikasiRM() {
                     )}
                     <TableCell className="whitespace-nowrap border-l">
                       <div className="flex gap-1">
-                        <Button size="icon" variant="ghost" onClick={() => openEdit(item)} title="Edit">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        {/* Re-entry button for rejected items */}
-                        {(item.rm_status === "Reject" || item.stabtest_status === "Reject" || item.scale_up_status === "Reject") && canCreate && (
-                          <Button size="icon" variant="ghost" onClick={() => openReentry(item)} title="Isi Ulang" className="text-yellow-600">
-                            <RotateCcw className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {canDelete && (
-                          <Button size="icon" variant="ghost" onClick={() => handleDelete(item.id)} className="text-destructive" title="Hapus">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                        {isItemLocked(item) ? (
+                          <span className="text-xs text-muted-foreground italic px-2">Terkunci</span>
+                        ) : (
+                          <>
+                            <Button size="icon" variant="ghost" onClick={() => openEdit(item)} title="Edit">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            {(item.rm_status === "Reject" || item.stabtest_status === "Reject" || item.scale_up_status === "Reject") && canCreate && (
+                              <Button size="icon" variant="ghost" onClick={() => openReentry(item)} title="Isi Ulang" className="text-yellow-600">
+                                <RotateCcw className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {canDelete && (
+                              <Button size="icon" variant="ghost" onClick={() => handleDelete(item.id)} className="text-destructive" title="Hapus">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </>
                         )}
                       </div>
                     </TableCell>
