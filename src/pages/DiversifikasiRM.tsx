@@ -195,6 +195,14 @@ export default function DiversifikasiRM() {
     fetchData();
   };
 
+  // Check if an item is locked (rejected + has a re-entry row with same no_rm)
+  const isItemLocked = (item: any) => {
+    const isRejected = item.rm_status === "Reject" || item.stabtest_status === "Reject" || item.scale_up_status === "Reject";
+    if (!isRejected || !item.no_rm) return false;
+    // Check if another row with same no_rm exists that was created after this one
+    return data.some(d => d.id !== item.id && d.no_rm === item.no_rm && new Date(d.created_at) > new Date(item.created_at));
+  };
+
   const filtered = data.filter((d) => {
     const s = search.toLowerCase();
     return (
