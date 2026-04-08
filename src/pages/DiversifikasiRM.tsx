@@ -195,6 +195,14 @@ export default function DiversifikasiRM() {
     fetchData();
   };
 
+  // Check if an item is locked (rejected + has a re-entry row with same no_rm)
+  const isItemLocked = (item: any) => {
+    const isRejected = item.rm_status === "Reject" || item.stabtest_status === "Reject" || item.scale_up_status === "Reject";
+    if (!isRejected || !item.no_rm) return false;
+    // Check if another row with same no_rm exists that was created after this one
+    return data.some(d => d.id !== item.id && d.no_rm === item.no_rm && new Date(d.created_at) > new Date(item.created_at));
+  };
+
   const filtered = data.filter((d) => {
     const s = search.toLowerCase();
     return (
@@ -303,19 +311,24 @@ export default function DiversifikasiRM() {
                     )}
                     <TableCell className="whitespace-nowrap border-l">
                       <div className="flex gap-1">
-                        <Button size="icon" variant="ghost" onClick={() => openEdit(item)} title="Edit">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        {/* Re-entry button for rejected items */}
-                        {(item.rm_status === "Reject" || item.stabtest_status === "Reject" || item.scale_up_status === "Reject") && canCreate && (
-                          <Button size="icon" variant="ghost" onClick={() => openReentry(item)} title="Isi Ulang" className="text-yellow-600">
-                            <RotateCcw className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {canDelete && (
-                          <Button size="icon" variant="ghost" onClick={() => handleDelete(item.id)} className="text-destructive" title="Hapus">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                        {isItemLocked(item) ? (
+                          <span className="text-xs text-muted-foreground italic px-2">Terkunci</span>
+                        ) : (
+                          <>
+                            <Button size="icon" variant="ghost" onClick={() => openEdit(item)} title="Edit">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                            {(item.rm_status === "Reject" || item.stabtest_status === "Reject" || item.scale_up_status === "Reject") && canCreate && (
+                              <Button size="icon" variant="ghost" onClick={() => openReentry(item)} title="Isi Ulang" className="text-yellow-600">
+                                <RotateCcw className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {canDelete && (
+                              <Button size="icon" variant="ghost" onClick={() => handleDelete(item.id)} className="text-destructive" title="Hapus">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </>
                         )}
                       </div>
                     </TableCell>
