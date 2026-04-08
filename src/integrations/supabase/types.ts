@@ -69,9 +69,40 @@ export type Database = {
           nama_material: string | null
           no_batch_material: string | null
           no_batch_scale_up: string | null
+          no_rm: string | null
+          produk_cek_karakteristik: string | null
+          produk_fisik: string | null
+          produk_kimia: string | null
+          produk_kode_item: string | null
+          produk_mikrobiologi: string | null
+          produk_sensori: string | null
+          produk_tgl_keluar_hasil: string | null
+          produk_tgl_kirim_qc: string | null
+          rm_cek_karakteristik: string | null
+          rm_fisik: string | null
+          rm_kimia: string | null
+          rm_mikrobiologi: string | null
+          rm_sensori_material: string | null
+          rm_status: string | null
+          rm_tgl_keluar_hasil: string | null
+          rm_tgl_kirim_qc: string | null
+          scale_up_kesimpulan: string | null
+          scale_up_link_file: string | null
+          scale_up_no_batch: string | null
+          scale_up_status: string | null
+          scale_up_tgl_dilakukan: string | null
+          scale_up_tgl_keluar_hasil: string | null
+          scale_up_tgl_kirim_qc: string | null
           sensori_material: string | null
           sensori_produk: string | null
           site: string | null
+          stabtest_fisik: string | null
+          stabtest_keterangan: string | null
+          stabtest_kimia: string | null
+          stabtest_mikrobiologi: string | null
+          stabtest_sensori_dfct: string | null
+          stabtest_status: string | null
+          status_project: string | null
           status_scale_up: string | null
           tes_fisik: string | null
           tes_kimia: string | null
@@ -108,9 +139,40 @@ export type Database = {
           nama_material?: string | null
           no_batch_material?: string | null
           no_batch_scale_up?: string | null
+          no_rm?: string | null
+          produk_cek_karakteristik?: string | null
+          produk_fisik?: string | null
+          produk_kimia?: string | null
+          produk_kode_item?: string | null
+          produk_mikrobiologi?: string | null
+          produk_sensori?: string | null
+          produk_tgl_keluar_hasil?: string | null
+          produk_tgl_kirim_qc?: string | null
+          rm_cek_karakteristik?: string | null
+          rm_fisik?: string | null
+          rm_kimia?: string | null
+          rm_mikrobiologi?: string | null
+          rm_sensori_material?: string | null
+          rm_status?: string | null
+          rm_tgl_keluar_hasil?: string | null
+          rm_tgl_kirim_qc?: string | null
+          scale_up_kesimpulan?: string | null
+          scale_up_link_file?: string | null
+          scale_up_no_batch?: string | null
+          scale_up_status?: string | null
+          scale_up_tgl_dilakukan?: string | null
+          scale_up_tgl_keluar_hasil?: string | null
+          scale_up_tgl_kirim_qc?: string | null
           sensori_material?: string | null
           sensori_produk?: string | null
           site?: string | null
+          stabtest_fisik?: string | null
+          stabtest_keterangan?: string | null
+          stabtest_kimia?: string | null
+          stabtest_mikrobiologi?: string | null
+          stabtest_sensori_dfct?: string | null
+          stabtest_status?: string | null
+          status_project?: string | null
           status_scale_up?: string | null
           tes_fisik?: string | null
           tes_kimia?: string | null
@@ -147,9 +209,40 @@ export type Database = {
           nama_material?: string | null
           no_batch_material?: string | null
           no_batch_scale_up?: string | null
+          no_rm?: string | null
+          produk_cek_karakteristik?: string | null
+          produk_fisik?: string | null
+          produk_kimia?: string | null
+          produk_kode_item?: string | null
+          produk_mikrobiologi?: string | null
+          produk_sensori?: string | null
+          produk_tgl_keluar_hasil?: string | null
+          produk_tgl_kirim_qc?: string | null
+          rm_cek_karakteristik?: string | null
+          rm_fisik?: string | null
+          rm_kimia?: string | null
+          rm_mikrobiologi?: string | null
+          rm_sensori_material?: string | null
+          rm_status?: string | null
+          rm_tgl_keluar_hasil?: string | null
+          rm_tgl_kirim_qc?: string | null
+          scale_up_kesimpulan?: string | null
+          scale_up_link_file?: string | null
+          scale_up_no_batch?: string | null
+          scale_up_status?: string | null
+          scale_up_tgl_dilakukan?: string | null
+          scale_up_tgl_keluar_hasil?: string | null
+          scale_up_tgl_kirim_qc?: string | null
           sensori_material?: string | null
           sensori_produk?: string | null
           site?: string | null
+          stabtest_fisik?: string | null
+          stabtest_keterangan?: string | null
+          stabtest_kimia?: string | null
+          stabtest_mikrobiologi?: string | null
+          stabtest_sensori_dfct?: string | null
+          stabtest_status?: string | null
+          status_project?: string | null
           status_scale_up?: string | null
           tes_fisik?: string | null
           tes_kimia?: string | null
