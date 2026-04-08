@@ -149,10 +149,14 @@ export default function DiversifikasiRM() {
   };
 
   const openReentry = (item: any) => {
-    setEditingItem(null);
+    setEditingItem(item);
     setIsReentry(true);
-    // Keep the same no_rm, clear data fields
-    setFormData({ no_rm: item.no_rm });
+    // Keep no_rm, clear all other fields for re-entry (update same row)
+    const fd: Record<string, string> = { no_rm: item.no_rm };
+    ALL_FIELD_KEYS.forEach((key) => {
+      if (key !== "no_rm") fd[key] = "";
+    });
+    setFormData(fd);
     setDialogOpen(true);
   };
 
