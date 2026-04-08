@@ -149,9 +149,9 @@ export default function DiversifikasiRM() {
   };
 
   const openReentry = (item: any) => {
-    setEditingItem(item);
+    setEditingItem(null); // null = will insert new row
     setIsReentry(true);
-    // Keep no_rm, clear all other fields for re-entry (update same row)
+    // Keep no_rm, clear all other fields for re-entry (new row, same no_rm)
     const fd: Record<string, string> = { no_rm: item.no_rm };
     ALL_FIELD_KEYS.forEach((key) => {
       if (key !== "no_rm") fd[key] = "";
