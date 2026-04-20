@@ -9,6 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
+  Trash2,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -35,6 +36,7 @@ export function AppSidebar() {
     ...(isAdmin ? [
       { title: "Users", url: "/users", icon: Users },
       { title: "Log Aktivitas", url: "/activity-log", icon: History },
+      { title: "Recycle Bin", url: "/recycle-bin", icon: Trash2 },
     ] : []),
     { title: "Settings", url: "/settings", icon: Settings },
   ];

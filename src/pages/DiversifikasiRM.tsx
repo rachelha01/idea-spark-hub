@@ -116,7 +116,7 @@ export default function DiversifikasiRM() {
   const [isReentry, setIsReentry] = useState(false);
 
   const fetchData = async () => {
-    let query = supabase.from("diversifikasi_rm").select("*").order("created_at", { ascending: false });
+    let query = supabase.from("diversifikasi_rm").select("*").is("deleted_at", null).order("created_at", { ascending: false });
     if (activeSite !== "all") query = query.eq("site", activeSite);
     const { data: d } = await query;
     setData(d ?? []);
@@ -187,11 +187,14 @@ export default function DiversifikasiRM() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Yakin hapus data ini?")) return;
-    const { error } = await supabase.from("diversifikasi_rm").delete().eq("id", id);
+    if (!confirm("Yakin hapus data ini? Data akan dipindahkan ke Recycle Bin selama 30 hari.")) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("diversifikasi_rm")
+      .update({ deleted_at: new Date().toISOString(), deleted_by: user?.id ?? null })
+      .eq("id", id);
     if (error) { toast.error(error.message); return; }
     await logActivity("delete", "diversifikasi_rm", id);
-    toast.success("Data berhasil dihapus");
+    toast.success("Data dipindahkan ke Recycle Bin");
     fetchData();
   };
 

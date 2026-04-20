@@ -56,7 +56,7 @@ export default function SampleQC() {
   const [exportMaterial, setExportMaterial] = useState("");
 
   const fetchData = async () => {
-    let query = supabase.from("sample_qc").select("*").order("created_at", { ascending: false });
+    let query = supabase.from("sample_qc").select("*").is("deleted_at", null).order("created_at", { ascending: false });
     if (activeSite !== "all") query = query.eq("site", activeSite);
     const { data: d } = await query;
     setData(d ?? []);
@@ -106,11 +106,14 @@ export default function SampleQC() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Yakin hapus data ini?")) return;
-    const { error } = await supabase.from("sample_qc").delete().eq("id", id);
+    if (!confirm("Yakin hapus data ini? Data akan dipindahkan ke Recycle Bin selama 30 hari.")) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("sample_qc")
+      .update({ deleted_at: new Date().toISOString(), deleted_by: user?.id ?? null })
+      .eq("id", id);
     if (error) { toast.error(error.message); return; }
     await logActivity("delete", "sample_qc", id);
-    toast.success("Data berhasil dihapus");
+    toast.success("Data dipindahkan ke Recycle Bin");
     fetchData();
   };
 

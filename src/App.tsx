@@ -12,6 +12,7 @@ import DiversifikasiRM from "./pages/DiversifikasiRM";
 import SampleQC from "./pages/SampleQC";
 import Users from "./pages/Users";
 import ActivityLog from "./pages/ActivityLog";
+import RecycleBin from "./pages/RecycleBin";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="/sample-qc" element={<ProtectedRoute><SampleQC /></ProtectedRoute>} />
               <Route path="/users" element={<ProtectedRoute adminOnly><Users /></ProtectedRoute>} />
               <Route path="/activity-log" element={<ProtectedRoute adminOnly><ActivityLog /></ProtectedRoute>} />
+              <Route path="/recycle-bin" element={<ProtectedRoute adminOnly><RecycleBin /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
