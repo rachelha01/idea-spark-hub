@@ -55,6 +55,8 @@ export type Database = {
           alokasi: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           id: string
           jenis_scale_up: string | null
           jenis_stabtest: string | null
@@ -125,6 +127,8 @@ export type Database = {
           alokasi?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           jenis_scale_up?: string | null
           jenis_stabtest?: string | null
@@ -195,6 +199,8 @@ export type Database = {
           alokasi?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           id?: string
           jenis_scale_up?: string | null
           jenis_stabtest?: string | null
@@ -482,6 +488,8 @@ export type Database = {
           batch: string | null
           created_at: string
           created_by: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           hasil_analisa: string | null
           id: string
           identitas_ma: string | null
@@ -508,6 +516,8 @@ export type Database = {
           batch?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           hasil_analisa?: string | null
           id?: string
           identitas_ma?: string | null
@@ -534,6 +544,8 @@ export type Database = {
           batch?: string | null
           created_at?: string
           created_by?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           hasil_analisa?: string | null
           id?: string
           identitas_ma?: string | null
@@ -627,6 +639,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      purge_old_deleted_records: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user" | "cpro" | "qc" | "ts"
