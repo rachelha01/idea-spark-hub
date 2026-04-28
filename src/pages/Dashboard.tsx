@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [diversifikasiData, setDiversifikasiData] = useState<any[]>([]);
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
+  const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
 
   useEffect(() => {
     const fetchData = async () => {
