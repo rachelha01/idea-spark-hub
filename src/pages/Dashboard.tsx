@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useSite } from "@/contexts/SiteContext";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [diversifikasiData, setDiversifikasiData] = useState<any[]>([]);
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
+  const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,6 +116,26 @@ export default function Dashboard() {
     .filter(([name]) => name !== "N/A")
     .map(([name, value]) => ({ name, value }));
 
+  // Diversifikasi RM: distribusi status project
+  const rmStatusCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+    const s = item.status_project || "N/A";
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+  const rmStatusData = Object.entries(rmStatusCounts)
+    .filter(([name]) => name !== "N/A")
+    .map(([name, value]) => ({ name, value }));
+
+  // Diversifikasi RM: distribusi kondisi penyimpanan
+  const rmKondisiCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+    const k = item.kondisi_penyimpanan_stabtest || "N/A";
+    acc[k] = (acc[k] || 0) + 1;
+    return acc;
+  }, {});
+  const rmKondisiData = Object.entries(rmKondisiCounts)
+    .filter(([name]) => name !== "N/A")
+    .map(([name, value]) => ({ name, value }));
+
   const LINE_COLORS = [
     "hsl(234, 56%, 38%)", "hsl(78, 100%, 37%)", "hsl(38, 92%, 50%)",
     "hsl(199, 89%, 48%)", "hsl(340, 75%, 55%)", "hsl(270, 60%, 50%)",
@@ -122,7 +144,32 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="p-4 md:p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start">
+            <Button
+              size="sm"
+              variant={chartView === "all" ? "default" : "ghost"}
+              onClick={() => setChartView("all")}
+            >
+              Semua
+            </Button>
+            <Button
+              size="sm"
+              variant={chartView === "rm" ? "default" : "ghost"}
+              onClick={() => setChartView("rm")}
+            >
+              Diversifikasi RM
+            </Button>
+            <Button
+              size="sm"
+              variant={chartView === "qc" ? "default" : "ghost"}
+              onClick={() => setChartView("qc")}
+            >
+              Sample to QC
+            </Button>
+          </div>
+        </div>
 
         {/* Warnings */}
         {warnings.length > 0 && (
@@ -150,173 +197,265 @@ export default function Dashboard() {
 
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Line Chart: Jumlah Sample Harian (2 Minggu) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Jumlah Sample Harian (2 Minggu Terakhir)</CardTitle>
-            </CardHeader>
-            <CardContent className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={lineData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
-                  <XAxis dataKey="date" fontSize={11} tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis fontSize={11} allowDecimals={false} tick={{ fill: "hsl(var(--muted-foreground))" }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                  <Legend />
-                  {allProducts.length <= 6 ? (
-                    allProducts.map((product, i) => (
-                      <Line
-                        key={product}
-                        type="monotone"
-                        dataKey={product}
-                        stroke={LINE_COLORS[i % LINE_COLORS.length]}
-                        strokeWidth={2}
-                        dot={{ r: 3 }}
-                        activeDot={{ r: 5 }}
+          {/* Sample QC Charts */}
+          {chartView !== "rm" && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Jumlah Sample Harian (2 Minggu Terakhir)</CardTitle>
+                </CardHeader>
+                <CardContent className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={lineData}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+                      <XAxis dataKey="date" fontSize={11} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <YAxis fontSize={11} allowDecimals={false} tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          color: "hsl(var(--foreground))",
+                        }}
                       />
-                    ))
-                  ) : (
-                    <Line
-                      type="monotone"
-                      dataKey="total"
-                      name="Total Sample"
-                      stroke="hsl(234, 56%, 38%)"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                      activeDot={{ r: 5 }}
-                    />
-                  )}
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+                      <Legend />
+                      {allProducts.length <= 6 ? (
+                        allProducts.map((product, i) => (
+                          <Line
+                            key={product}
+                            type="monotone"
+                            dataKey={product}
+                            stroke={LINE_COLORS[i % LINE_COLORS.length]}
+                            strokeWidth={2}
+                            dot={{ r: 3 }}
+                            activeDot={{ r: 5 }}
+                          />
+                        ))
+                      ) : (
+                        <Line
+                          type="monotone"
+                          dataKey="total"
+                          name="Total Sample"
+                          stroke="hsl(234, 56%, 38%)"
+                          strokeWidth={2}
+                          dot={{ r: 3 }}
+                          activeDot={{ r: 5 }}
+                        />
+                      )}
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
 
-          {/* Donut Chart: Hasil Analisa (MS, TMS, OP) */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Hasil Analisa Sample QC</CardTitle>
-            </CardHeader>
-            <CardContent className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={donutData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={55}
-                    outerRadius={90}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    labelLine={true}
-                  >
-                    {donutData.map((entry, i) => {
-                      const colorMap: Record<string, string> = {
-                        MS: COLORS[0],
-                        TMS: COLORS[1],
-                        OP: COLORS[2],
-                      };
-                      return <Cell key={i} fill={colorMap[entry.name] || COLORS[i % COLORS.length]} />;
-                    })}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "8px",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Hasil Analisa Sample QC</CardTitle>
+                </CardHeader>
+                <CardContent className="h-72">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={donutData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={55}
+                        outerRadius={90}
+                        dataKey="value"
+                        label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                        labelLine={true}
+                      >
+                        {donutData.map((entry, i) => {
+                          const colorMap: Record<string, string> = {
+                            MS: COLORS[0],
+                            TMS: COLORS[1],
+                            OP: COLORS[2],
+                          };
+                          return <Cell key={i} fill={colorMap[entry.name] || COLORS[i % COLORS.length]} />;
+                        })}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: "8px",
+                          color: "hsl(var(--foreground))",
+                        }}
+                      />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </>
+          )}
+
+          {/* Diversifikasi RM Charts */}
+          {chartView !== "qc" && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Status Project Diversifikasi RM</CardTitle>
+                </CardHeader>
+                <CardContent className="h-72">
+                  {rmStatusData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={rmStatusData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={55}
+                          outerRadius={90}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                          labelLine={true}
+                        >
+                          {rmStatusData.map((_, i) => (
+                            <Cell key={i} fill={LINE_COLORS[i % LINE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            color: "hsl(var(--foreground))",
+                          }}
+                        />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+                      Belum ada data
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Kondisi Penyimpanan RM</CardTitle>
+                </CardHeader>
+                <CardContent className="h-72">
+                  {rmKondisiData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={rmKondisiData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={55}
+                          outerRadius={90}
+                          dataKey="value"
+                          label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                          labelLine={true}
+                        >
+                          {rmKondisiData.map((_, i) => (
+                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            border: "1px solid hsl(var(--border))",
+                            borderRadius: "8px",
+                            color: "hsl(var(--foreground))",
+                          }}
+                        />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+                      Belum ada data
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
 
         {/* Tables Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Sample QC Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Sample to QC</CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Kode Produk</TableHead>
-                    <TableHead>Batch</TableHead>
-                    <TableHead>Tgl Kirim</TableHead>
-                    <TableHead>Tgl Selesai Analisa</TableHead>
-                    <TableHead>Hasil Analisa</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sampleQcData.slice(0, 10).map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.kode_produk ?? "-"}</TableCell>
-                      <TableCell>{item.batch ?? "-"}</TableCell>
-                      <TableCell>{item.tgl_kirim ? format(new Date(item.tgl_kirim), "dd/MM/yyyy") : "-"}</TableCell>
-                      <TableCell>{item.tgl_selesai_analisa ? format(new Date(item.tgl_selesai_analisa), "dd/MM/yyyy") : "-"}</TableCell>
-                      <TableCell>
-                        {item.hasil_analisa ? (
-                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
-                            item.hasil_analisa === "MS" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
-                            item.hasil_analisa === "TMS" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" :
-                            "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
-                          }`}>
-                            {item.hasil_analisa}
-                          </span>
-                        ) : "-"}
-                      </TableCell>
+          {chartView !== "rm" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Sample to QC</CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kode Produk</TableHead>
+                      <TableHead>Batch</TableHead>
+                      <TableHead>Tgl Kirim</TableHead>
+                      <TableHead>Tgl Selesai Analisa</TableHead>
+                      <TableHead>Hasil Analisa</TableHead>
                     </TableRow>
-                  ))}
-                  {sampleQcData.length === 0 && (
-                    <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {sampleQcData.slice(0, 10).map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.kode_produk ?? "-"}</TableCell>
+                        <TableCell>{item.batch ?? "-"}</TableCell>
+                        <TableCell>{item.tgl_kirim ? format(new Date(item.tgl_kirim), "dd/MM/yyyy") : "-"}</TableCell>
+                        <TableCell>{item.tgl_selesai_analisa ? format(new Date(item.tgl_selesai_analisa), "dd/MM/yyyy") : "-"}</TableCell>
+                        <TableCell>
+                          {item.hasil_analisa ? (
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                              item.hasil_analisa === "MS" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" :
+                              item.hasil_analisa === "TMS" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" :
+                              "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400"
+                            }`}>
+                              {item.hasil_analisa}
+                            </span>
+                          ) : "-"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {sampleQcData.length === 0 && (
+                      <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
 
-          {/* Diversifikasi RM Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Diversifikasi RM</CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Kode Item</TableHead>
-                    <TableHead>Batch</TableHead>
-                    <TableHead>Kondisi Penyimpanan</TableHead>
-                    <TableHead>Usia Penyimpanan</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {diversifikasiData.slice(0, 10).map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{item.kode_item ?? "-"}</TableCell>
-                      <TableCell>{item.no_batch_material ?? "-"}</TableCell>
-                      <TableCell>{item.kondisi_penyimpanan_stabtest ?? "-"}</TableCell>
-                      <TableCell>{item.usia_penyimpanan ?? "-"}</TableCell>
+          {chartView !== "qc" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Diversifikasi RM</CardTitle>
+              </CardHeader>
+              <CardContent className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kode Item</TableHead>
+                      <TableHead>Batch</TableHead>
+                      <TableHead>Kondisi Penyimpanan</TableHead>
+                      <TableHead>Usia Penyimpanan</TableHead>
                     </TableRow>
-                  ))}
-                  {diversifikasiData.length === 0 && (
-                    <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                  </TableHeader>
+                  <TableBody>
+                    {diversifikasiData.slice(0, 10).map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.kode_item ?? "-"}</TableCell>
+                        <TableCell>{item.no_batch_material ?? "-"}</TableCell>
+                        <TableCell>{item.kondisi_penyimpanan_stabtest ?? "-"}</TableCell>
+                        <TableCell>{item.usia_penyimpanan ?? "-"}</TableCell>
+                      </TableRow>
+                    ))}
+                    {diversifikasiData.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </DashboardLayout>
