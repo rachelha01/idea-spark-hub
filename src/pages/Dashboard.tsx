@@ -116,6 +116,26 @@ export default function Dashboard() {
     .filter(([name]) => name !== "N/A")
     .map(([name, value]) => ({ name, value }));
 
+  // Diversifikasi RM: distribusi status project
+  const rmStatusCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+    const s = item.status_project || "N/A";
+    acc[s] = (acc[s] || 0) + 1;
+    return acc;
+  }, {});
+  const rmStatusData = Object.entries(rmStatusCounts)
+    .filter(([name]) => name !== "N/A")
+    .map(([name, value]) => ({ name, value }));
+
+  // Diversifikasi RM: distribusi kondisi penyimpanan
+  const rmKondisiCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+    const k = item.kondisi_penyimpanan_stabtest || "N/A";
+    acc[k] = (acc[k] || 0) + 1;
+    return acc;
+  }, {});
+  const rmKondisiData = Object.entries(rmKondisiCounts)
+    .filter(([name]) => name !== "N/A")
+    .map(([name, value]) => ({ name, value }));
+
   const LINE_COLORS = [
     "hsl(234, 56%, 38%)", "hsl(78, 100%, 37%)", "hsl(38, 92%, 50%)",
     "hsl(199, 89%, 48%)", "hsl(340, 75%, 55%)", "hsl(270, 60%, 50%)",
