@@ -124,7 +124,32 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="p-4 md:p-6 space-y-6">
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start">
+            <Button
+              size="sm"
+              variant={chartView === "all" ? "default" : "ghost"}
+              onClick={() => setChartView("all")}
+            >
+              Semua
+            </Button>
+            <Button
+              size="sm"
+              variant={chartView === "rm" ? "default" : "ghost"}
+              onClick={() => setChartView("rm")}
+            >
+              Diversifikasi RM
+            </Button>
+            <Button
+              size="sm"
+              variant={chartView === "qc" ? "default" : "ghost"}
+              onClick={() => setChartView("qc")}
+            >
+              Sample to QC
+            </Button>
+          </div>
+        </div>
 
         {/* Warnings */}
         {warnings.length > 0 && (
