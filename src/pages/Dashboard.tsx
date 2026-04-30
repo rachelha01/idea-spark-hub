@@ -192,6 +192,17 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Period Filter */}
+        <div className="flex flex-col md:flex-row md:items-center gap-2">
+          <span className="text-sm text-muted-foreground">Periode:</span>
+          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start">
+            <Button size="sm" variant={periodFilter === "week" ? "default" : "ghost"} onClick={() => setPeriodFilter("week")}>Minggu Ini</Button>
+            <Button size="sm" variant={periodFilter === "month" ? "default" : "ghost"} onClick={() => setPeriodFilter("month")}>Bulan Ini</Button>
+            <Button size="sm" variant={periodFilter === "year" ? "default" : "ghost"} onClick={() => setPeriodFilter("year")}>Tahun Ini</Button>
+            <Button size="sm" variant={periodFilter === "all" ? "default" : "ghost"} onClick={() => setPeriodFilter("all")}>Semua</Button>
+          </div>
+        </div>
+
         {/* Warnings */}
         {warnings.length > 0 && (
           <Card className="border-warning bg-warning/10">
