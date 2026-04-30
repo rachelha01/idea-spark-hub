@@ -12,7 +12,7 @@ import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { addDays, isAfter, isBefore, format, subDays } from "date-fns";
+import { addDays, isAfter, isBefore, format, subDays, subMonths, subYears, startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
 const COLORS = [
   "hsl(142, 71%, 45%)",  // MS - green
@@ -34,6 +34,19 @@ export default function Dashboard() {
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
+  const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all">("month");
+
+  // Compute period start date
+  const getPeriodStart = (): Date | null => {
+    const now = new Date();
+    switch (periodFilter) {
+      case "week": return startOfWeek(now, { weekStartsOn: 1 });
+      case "month": return startOfMonth(now);
+      case "year": return startOfYear(now);
+      case "all": return null;
+    }
+  };
+  const periodStart = getPeriodStart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,15 +92,23 @@ export default function Dashboard() {
     fetchData();
   }, [activeSite]);
 
-  // Line Chart: daily sample count over last 2 weeks (by nama_produk from tgl_kirim)
-  const twoWeeksAgo = subDays(new Date(), 14);
-  const recentSamples = sampleQcData.filter((item) => {
-    if (!item.tgl_kirim) return false;
-    return isAfter(new Date(item.tgl_kirim), twoWeeksAgo);
-  });
+  // Apply period filter to both datasets
+  const filterByPeriod = (items: any[], dateField: string) => {
+    if (!periodStart) return items;
+    return items.filter((item) => {
+      const d = item[dateField] || item.created_at;
+      if (!d) return false;
+      return isAfter(new Date(d), periodStart);
+    });
+  };
 
+  const filteredSampleQc = filterByPeriod(sampleQcData, "tgl_kirim");
+  const filteredDiversifikasi = filterByPeriod(diversifikasiData, "created_at");
+
+  // Line Chart: daily sample count within selected period
   const dailyCounts: Record<string, Record<string, number>> = {};
-  recentSamples.forEach((item) => {
+  filteredSampleQc.forEach((item) => {
+    if (!item.tgl_kirim) return;
     const day = item.tgl_kirim;
     const name = item.nama_produk || "Unknown";
     if (!dailyCounts[day]) dailyCounts[day] = {};
@@ -95,7 +116,7 @@ export default function Dashboard() {
   });
 
   // Get all unique product names for lines
-  const allProducts = [...new Set(recentSamples.map((s) => s.nama_produk || "Unknown"))];
+  const allProducts = [...new Set(filteredSampleQc.filter(s => s.tgl_kirim).map((s) => s.nama_produk || "Unknown"))];
 
   const lineData = Object.entries(dailyCounts)
     .sort(([a], [b]) => a.localeCompare(b))
@@ -107,7 +128,7 @@ export default function Dashboard() {
     });
 
   // Donut Chart: hasil_analisa distribution (MS, TMS, OP)
-  const hasilCounts = sampleQcData.reduce((acc: Record<string, number>, item) => {
+  const hasilCounts = filteredSampleQc.reduce((acc: Record<string, number>, item) => {
     const h = item.hasil_analisa || "N/A";
     acc[h] = (acc[h] || 0) + 1;
     return acc;
@@ -117,7 +138,7 @@ export default function Dashboard() {
     .map(([name, value]) => ({ name, value }));
 
   // Diversifikasi RM: distribusi status project
-  const rmStatusCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+  const rmStatusCounts = filteredDiversifikasi.reduce((acc: Record<string, number>, item) => {
     const s = item.status_project || "N/A";
     acc[s] = (acc[s] || 0) + 1;
     return acc;
@@ -127,7 +148,7 @@ export default function Dashboard() {
     .map(([name, value]) => ({ name, value }));
 
   // Diversifikasi RM: distribusi kondisi penyimpanan
-  const rmKondisiCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+  const rmKondisiCounts = filteredDiversifikasi.reduce((acc: Record<string, number>, item) => {
     const k = item.kondisi_penyimpanan_stabtest || "N/A";
     acc[k] = (acc[k] || 0) + 1;
     return acc;
@@ -168,6 +189,17 @@ export default function Dashboard() {
             >
               Sample to QC
             </Button>
+          </div>
+        </div>
+
+        {/* Period Filter */}
+        <div className="flex flex-col md:flex-row md:items-center gap-2">
+          <span className="text-sm text-muted-foreground">Periode:</span>
+          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start">
+            <Button size="sm" variant={periodFilter === "week" ? "default" : "ghost"} onClick={() => setPeriodFilter("week")}>Minggu Ini</Button>
+            <Button size="sm" variant={periodFilter === "month" ? "default" : "ghost"} onClick={() => setPeriodFilter("month")}>Bulan Ini</Button>
+            <Button size="sm" variant={periodFilter === "year" ? "default" : "ghost"} onClick={() => setPeriodFilter("year")}>Tahun Ini</Button>
+            <Button size="sm" variant={periodFilter === "all" ? "default" : "ghost"} onClick={() => setPeriodFilter("all")}>Semua</Button>
           </div>
         </div>
 
@@ -396,7 +428,7 @@ export default function Dashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sampleQcData.slice(0, 10).map((item) => (
+                    {filteredSampleQc.slice(0, 10).map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.kode_produk ?? "-"}</TableCell>
                         <TableCell>{item.batch ?? "-"}</TableCell>
@@ -415,7 +447,7 @@ export default function Dashboard() {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {sampleQcData.length === 0 && (
+                    {filteredSampleQc.length === 0 && (
                       <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
                     )}
                   </TableBody>
@@ -440,7 +472,7 @@ export default function Dashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {diversifikasiData.slice(0, 10).map((item) => (
+                    {filteredDiversifikasi.slice(0, 10).map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.kode_item ?? "-"}</TableCell>
                         <TableCell>{item.no_batch_material ?? "-"}</TableCell>
@@ -448,7 +480,7 @@ export default function Dashboard() {
                         <TableCell>{item.usia_penyimpanan ?? "-"}</TableCell>
                       </TableRow>
                     ))}
-                    {diversifikasiData.length === 0 && (
+                    {filteredDiversifikasi.length === 0 && (
                       <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
                     )}
                   </TableBody>
