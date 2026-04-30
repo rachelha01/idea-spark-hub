@@ -2,17 +2,21 @@ import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useSite } from "@/contexts/SiteContext";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Calendar as CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { addDays, isAfter, isBefore, format, subDays, subMonths, subYears, startOfWeek, startOfMonth, startOfYear } from "date-fns";
+import { addDays, isAfter, isBefore, format, subDays, subMonths, subYears, startOfWeek, startOfMonth, startOfYear, endOfDay, startOfDay } from "date-fns";
+import { DateRange } from "react-day-picker";
+import { cn } from "@/lib/utils";
 
 const COLORS = [
   "hsl(142, 71%, 45%)",  // MS - green
@@ -34,19 +38,24 @@ export default function Dashboard() {
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
-  const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all">("month");
+  const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all" | "custom">("month");
+  const [customRange, setCustomRange] = useState<DateRange | undefined>();
 
-  // Compute period start date
-  const getPeriodStart = (): Date | null => {
+  // Compute period range [start, end] (end is exclusive upper bound when null)
+  const getPeriodRange = (): { start: Date | null; end: Date | null } => {
     const now = new Date();
     switch (periodFilter) {
-      case "week": return startOfWeek(now, { weekStartsOn: 1 });
-      case "month": return startOfMonth(now);
-      case "year": return startOfYear(now);
-      case "all": return null;
+      case "week": return { start: startOfWeek(now, { weekStartsOn: 1 }), end: null };
+      case "month": return { start: startOfMonth(now), end: null };
+      case "year": return { start: startOfYear(now), end: null };
+      case "custom": return {
+        start: customRange?.from ? startOfDay(customRange.from) : null,
+        end: customRange?.to ? endOfDay(customRange.to) : (customRange?.from ? endOfDay(customRange.from) : null),
+      };
+      case "all": return { start: null, end: null };
     }
   };
-  const periodStart = getPeriodStart();
+  const { start: periodStart, end: periodEnd } = getPeriodRange();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,11 +103,14 @@ export default function Dashboard() {
 
   // Apply period filter to both datasets
   const filterByPeriod = (items: any[], dateField: string) => {
-    if (!periodStart) return items;
+    if (!periodStart && !periodEnd) return items;
     return items.filter((item) => {
       const d = item[dateField] || item.created_at;
       if (!d) return false;
-      return isAfter(new Date(d), periodStart);
+      const date = new Date(d);
+      if (periodStart && !isAfter(date, periodStart) && date.getTime() !== periodStart.getTime()) return false;
+      if (periodEnd && isAfter(date, periodEnd)) return false;
+      return true;
     });
   };
 
@@ -193,14 +205,49 @@ export default function Dashboard() {
         </div>
 
         {/* Period Filter */}
-        <div className="flex flex-col md:flex-row md:items-center gap-2">
+        <div className="flex flex-col md:flex-row md:items-center gap-2 flex-wrap">
           <span className="text-sm text-muted-foreground">Periode:</span>
-          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start">
+          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start flex-wrap">
             <Button size="sm" variant={periodFilter === "week" ? "default" : "ghost"} onClick={() => setPeriodFilter("week")}>Minggu Ini</Button>
             <Button size="sm" variant={periodFilter === "month" ? "default" : "ghost"} onClick={() => setPeriodFilter("month")}>Bulan Ini</Button>
             <Button size="sm" variant={periodFilter === "year" ? "default" : "ghost"} onClick={() => setPeriodFilter("year")}>Tahun Ini</Button>
             <Button size="sm" variant={periodFilter === "all" ? "default" : "ghost"} onClick={() => setPeriodFilter("all")}>Semua</Button>
+            <Button size="sm" variant={periodFilter === "custom" ? "default" : "ghost"} onClick={() => setPeriodFilter("custom")}>Kustom</Button>
           </div>
+
+          {periodFilter === "custom" && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn("justify-start text-left font-normal", !customRange?.from && "text-muted-foreground")}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customRange?.from ? (
+                    customRange.to ? (
+                      <>{format(customRange.from, "dd/MM/yyyy")} – {format(customRange.to, "dd/MM/yyyy")}</>
+                    ) : (
+                      format(customRange.from, "dd/MM/yyyy")
+                    )
+                  ) : (
+                    <span>Pilih rentang tanggal</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={customRange?.from}
+                  selected={customRange}
+                  onSelect={setCustomRange}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Warnings */}
