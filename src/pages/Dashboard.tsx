@@ -218,7 +218,13 @@ export default function Dashboard() {
           </div>
 
           {periodFilter === "custom" && (
-            <Popover>
+            <Popover
+              open={customPopoverOpen}
+              onOpenChange={(open) => {
+                setCustomPopoverOpen(open);
+                if (open) setPendingCustomRange(customRange);
+              }}
+            >
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -241,12 +247,42 @@ export default function Dashboard() {
                 <Calendar
                   initialFocus
                   mode="range"
-                  defaultMonth={customRange?.from}
-                  selected={customRange}
-                  onSelect={setCustomRange}
+                  defaultMonth={pendingCustomRange?.from}
+                  selected={pendingCustomRange}
+                  onSelect={setPendingCustomRange}
                   numberOfMonths={2}
                   className={cn("p-3 pointer-events-auto")}
                 />
+                <div className="flex items-center justify-end gap-2 border-t border-border p-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setPendingCustomRange(undefined);
+                      setCustomRange(undefined);
+                      setCustomPopoverOpen(false);
+                    }}
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCustomPopoverOpen(false)}
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    size="sm"
+                    disabled={!pendingCustomRange?.from}
+                    onClick={() => {
+                      setCustomRange(pendingCustomRange);
+                      setCustomPopoverOpen(false);
+                    }}
+                  >
+                    Terapkan
+                  </Button>
+                </div>
               </PopoverContent>
             </Popover>
           )}
