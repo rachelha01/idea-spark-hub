@@ -40,6 +40,8 @@ export default function Dashboard() {
   const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
   const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all" | "custom">("month");
   const [customRange, setCustomRange] = useState<DateRange | undefined>();
+  const [pendingCustomRange, setPendingCustomRange] = useState<DateRange | undefined>();
+  const [customPopoverOpen, setCustomPopoverOpen] = useState(false);
 
   // Compute period range [start, end] (end is exclusive upper bound when null)
   const getPeriodRange = (): { start: Date | null; end: Date | null } => {
