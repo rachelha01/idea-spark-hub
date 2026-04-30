@@ -428,7 +428,7 @@ export default function Dashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sampleQcData.slice(0, 10).map((item) => (
+                    {filteredSampleQc.slice(0, 10).map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.kode_produk ?? "-"}</TableCell>
                         <TableCell>{item.batch ?? "-"}</TableCell>
@@ -447,7 +447,7 @@ export default function Dashboard() {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {sampleQcData.length === 0 && (
+                    {filteredSampleQc.length === 0 && (
                       <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
                     )}
                   </TableBody>
@@ -472,7 +472,7 @@ export default function Dashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {diversifikasiData.slice(0, 10).map((item) => (
+                    {filteredDiversifikasi.slice(0, 10).map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.kode_item ?? "-"}</TableCell>
                         <TableCell>{item.no_batch_material ?? "-"}</TableCell>
@@ -480,7 +480,7 @@ export default function Dashboard() {
                         <TableCell>{item.usia_penyimpanan ?? "-"}</TableCell>
                       </TableRow>
                     ))}
-                    {diversifikasiData.length === 0 && (
+                    {filteredDiversifikasi.length === 0 && (
                       <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Belum ada data</TableCell></TableRow>
                     )}
                   </TableBody>
