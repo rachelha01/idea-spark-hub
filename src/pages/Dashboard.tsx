@@ -92,15 +92,23 @@ export default function Dashboard() {
     fetchData();
   }, [activeSite]);
 
-  // Line Chart: daily sample count over last 2 weeks (by nama_produk from tgl_kirim)
-  const twoWeeksAgo = subDays(new Date(), 14);
-  const recentSamples = sampleQcData.filter((item) => {
-    if (!item.tgl_kirim) return false;
-    return isAfter(new Date(item.tgl_kirim), twoWeeksAgo);
-  });
+  // Apply period filter to both datasets
+  const filterByPeriod = (items: any[], dateField: string) => {
+    if (!periodStart) return items;
+    return items.filter((item) => {
+      const d = item[dateField] || item.created_at;
+      if (!d) return false;
+      return isAfter(new Date(d), periodStart);
+    });
+  };
 
+  const filteredSampleQc = filterByPeriod(sampleQcData, "tgl_kirim");
+  const filteredDiversifikasi = filterByPeriod(diversifikasiData, "created_at");
+
+  // Line Chart: daily sample count within selected period
   const dailyCounts: Record<string, Record<string, number>> = {};
-  recentSamples.forEach((item) => {
+  filteredSampleQc.forEach((item) => {
+    if (!item.tgl_kirim) return;
     const day = item.tgl_kirim;
     const name = item.nama_produk || "Unknown";
     if (!dailyCounts[day]) dailyCounts[day] = {};
@@ -108,7 +116,7 @@ export default function Dashboard() {
   });
 
   // Get all unique product names for lines
-  const allProducts = [...new Set(recentSamples.map((s) => s.nama_produk || "Unknown"))];
+  const allProducts = [...new Set(filteredSampleQc.filter(s => s.tgl_kirim).map((s) => s.nama_produk || "Unknown"))];
 
   const lineData = Object.entries(dailyCounts)
     .sort(([a], [b]) => a.localeCompare(b))
@@ -120,7 +128,7 @@ export default function Dashboard() {
     });
 
   // Donut Chart: hasil_analisa distribution (MS, TMS, OP)
-  const hasilCounts = sampleQcData.reduce((acc: Record<string, number>, item) => {
+  const hasilCounts = filteredSampleQc.reduce((acc: Record<string, number>, item) => {
     const h = item.hasil_analisa || "N/A";
     acc[h] = (acc[h] || 0) + 1;
     return acc;
@@ -130,7 +138,7 @@ export default function Dashboard() {
     .map(([name, value]) => ({ name, value }));
 
   // Diversifikasi RM: distribusi status project
-  const rmStatusCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+  const rmStatusCounts = filteredDiversifikasi.reduce((acc: Record<string, number>, item) => {
     const s = item.status_project || "N/A";
     acc[s] = (acc[s] || 0) + 1;
     return acc;
@@ -140,7 +148,7 @@ export default function Dashboard() {
     .map(([name, value]) => ({ name, value }));
 
   // Diversifikasi RM: distribusi kondisi penyimpanan
-  const rmKondisiCounts = diversifikasiData.reduce((acc: Record<string, number>, item) => {
+  const rmKondisiCounts = filteredDiversifikasi.reduce((acc: Record<string, number>, item) => {
     const k = item.kondisi_penyimpanan_stabtest || "N/A";
     acc[k] = (acc[k] || 0) + 1;
     return acc;
