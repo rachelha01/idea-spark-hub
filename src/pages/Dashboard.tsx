@@ -103,11 +103,14 @@ export default function Dashboard() {
 
   // Apply period filter to both datasets
   const filterByPeriod = (items: any[], dateField: string) => {
-    if (!periodStart) return items;
+    if (!periodStart && !periodEnd) return items;
     return items.filter((item) => {
       const d = item[dateField] || item.created_at;
       if (!d) return false;
-      return isAfter(new Date(d), periodStart);
+      const date = new Date(d);
+      if (periodStart && !isAfter(date, periodStart) && date.getTime() !== periodStart.getTime()) return false;
+      if (periodEnd && isAfter(date, periodEnd)) return false;
+      return true;
     });
   };
 
