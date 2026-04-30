@@ -205,14 +205,49 @@ export default function Dashboard() {
         </div>
 
         {/* Period Filter */}
-        <div className="flex flex-col md:flex-row md:items-center gap-2">
+        <div className="flex flex-col md:flex-row md:items-center gap-2 flex-wrap">
           <span className="text-sm text-muted-foreground">Periode:</span>
-          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start">
+          <div className="inline-flex rounded-md border border-border bg-card p-1 self-start flex-wrap">
             <Button size="sm" variant={periodFilter === "week" ? "default" : "ghost"} onClick={() => setPeriodFilter("week")}>Minggu Ini</Button>
             <Button size="sm" variant={periodFilter === "month" ? "default" : "ghost"} onClick={() => setPeriodFilter("month")}>Bulan Ini</Button>
             <Button size="sm" variant={periodFilter === "year" ? "default" : "ghost"} onClick={() => setPeriodFilter("year")}>Tahun Ini</Button>
             <Button size="sm" variant={periodFilter === "all" ? "default" : "ghost"} onClick={() => setPeriodFilter("all")}>Semua</Button>
+            <Button size="sm" variant={periodFilter === "custom" ? "default" : "ghost"} onClick={() => setPeriodFilter("custom")}>Kustom</Button>
           </div>
+
+          {periodFilter === "custom" && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn("justify-start text-left font-normal", !customRange?.from && "text-muted-foreground")}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {customRange?.from ? (
+                    customRange.to ? (
+                      <>{format(customRange.from, "dd/MM/yyyy")} – {format(customRange.to, "dd/MM/yyyy")}</>
+                    ) : (
+                      format(customRange.from, "dd/MM/yyyy")
+                    )
+                  ) : (
+                    <span>Pilih rentang tanggal</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={customRange?.from}
+                  selected={customRange}
+                  onSelect={setCustomRange}
+                  numberOfMonths={2}
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Warnings */}
