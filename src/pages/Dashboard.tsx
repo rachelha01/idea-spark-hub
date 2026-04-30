@@ -38,19 +38,24 @@ export default function Dashboard() {
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
-  const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all">("month");
+  const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all" | "custom">("month");
+  const [customRange, setCustomRange] = useState<DateRange | undefined>();
 
-  // Compute period start date
-  const getPeriodStart = (): Date | null => {
+  // Compute period range [start, end] (end is exclusive upper bound when null)
+  const getPeriodRange = (): { start: Date | null; end: Date | null } => {
     const now = new Date();
     switch (periodFilter) {
-      case "week": return startOfWeek(now, { weekStartsOn: 1 });
-      case "month": return startOfMonth(now);
-      case "year": return startOfYear(now);
-      case "all": return null;
+      case "week": return { start: startOfWeek(now, { weekStartsOn: 1 }), end: null };
+      case "month": return { start: startOfMonth(now), end: null };
+      case "year": return { start: startOfYear(now), end: null };
+      case "custom": return {
+        start: customRange?.from ? startOfDay(customRange.from) : null,
+        end: customRange?.to ? endOfDay(customRange.to) : (customRange?.from ? endOfDay(customRange.from) : null),
+      };
+      case "all": return { start: null, end: null };
     }
   };
-  const periodStart = getPeriodStart();
+  const { start: periodStart, end: periodEnd } = getPeriodRange();
 
   useEffect(() => {
     const fetchData = async () => {
