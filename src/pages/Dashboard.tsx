@@ -34,6 +34,19 @@ export default function Dashboard() {
   const [sampleQcData, setSampleQcData] = useState<any[]>([]);
   const [warnings, setWarnings] = useState<Warning[]>([]);
   const [chartView, setChartView] = useState<"all" | "rm" | "qc">("all");
+  const [periodFilter, setPeriodFilter] = useState<"week" | "month" | "year" | "all">("month");
+
+  // Compute period start date
+  const getPeriodStart = (): Date | null => {
+    const now = new Date();
+    switch (periodFilter) {
+      case "week": return startOfWeek(now, { weekStartsOn: 1 });
+      case "month": return startOfMonth(now);
+      case "year": return startOfYear(now);
+      case "all": return null;
+    }
+  };
+  const periodStart = getPeriodStart();
 
   useEffect(() => {
     const fetchData = async () => {
